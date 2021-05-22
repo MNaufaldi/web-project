@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 // import { reduxForm } from 'redux-form';
 
 class LoginForm extends React.Component{
@@ -24,4 +25,4 @@ class LoginForm extends React.Component{
 }
    
 
-export default LoginForm
+export default connect(null,{signIn, signOut})(LoginForm)

@@ -1,13 +1,16 @@
 import Schedule from './Schedule'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
-const ScheduleList = ({ schedules }) => {
-    return (
-        <div className="ui relaxed divided list">
-            {schedules.map((schedule) => (
-                <Schedule key={schedule.id} schedule={schedule}/>
-            ))}
-        </div>
-    )
+
+class ScheduleList extends Component{
+    render(){
+        return(
+            <div className="ui relaxed divided list">
+                <Schedule />
+            </div>
+        )
+    }
 }
 
-export default ScheduleList
+export default ScheduleList;
