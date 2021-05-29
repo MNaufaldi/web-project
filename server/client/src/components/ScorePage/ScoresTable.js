@@ -1,7 +1,7 @@
 import React from 'react'
 import ScoresTableRow from './ScoresTableRow'
 
-const ScoresTable = ( {subjects} ) => {
+const ScoresTable = () => {
     return (
         // Table length is 16 total
         <table className="ui fixed celled structured table">
@@ -20,9 +20,7 @@ const ScoresTable = ( {subjects} ) => {
                 </tr>
             </thead>
             <tbody>
-                {subjects.map((subject) => (
-                    <ScoresTableRow key={subject.id} subject={subject}/>
-                ))}
+                <ScoresTableRow />
             </tbody>
         </table>
     )

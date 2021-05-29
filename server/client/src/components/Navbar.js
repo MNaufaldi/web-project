@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 const Navbar = () => {
     return (
         <div>
@@ -5,15 +7,13 @@ const Navbar = () => {
                 <div className="item acc">
                     Acc info
                 </div>
-                <a className="active item">
-                    Home / Dashboard (Undecided)
-                </a>
+                <Link to='/' className="item">Home</Link>
                 <a className="item">
                     Schedule / Calendar (Undecided)
                 </a>
-                <a className="item">
-                    Scores
-                </a>
+                
+                <Link to='/score' className="item">Scores</Link>
+
             </div>
         </div>
     )

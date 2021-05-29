@@ -8,6 +8,7 @@ const Student = require('../models/Student');
 router.get('/', (req, res) => {
     Student.find()
     .then(students => res.json(students))
+    // res.send('pog')
 });
 
 router.get('/:id', (req, res) => {

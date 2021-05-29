@@ -1,15 +1,12 @@
 
-const ScoresTableRow = ({ subject }) => {
+const ScoresTableRow = () => {
     return (
         <tr>
             <td>
                 <div className="content">
-                    {subject.name}
                 </div>
             </td>
-            {subject.scores.map((score) => (
-                    <td>{score}</td>
-                ))}
+            <td>1</td>
         </tr>
     )
 }

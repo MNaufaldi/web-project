@@ -1,40 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
-// const Post = ({ post }) => {
-//     return (
-//         <div className="column" style={{marginBottom: '5%'}}>
-//             <div className="ui card" style={{position: 'relative', width: '100%'}}>
-//                 <div className="content">
-//                     <img src="#" className="left floated mini ui image"></img>
-//                     <div className="header">
-//                         {post.teacherName}
-//                     </div>
-//                     <div className="meta">
-//                         {post.subject}
-//                     </div>
-//                 </div>
-//                 <div className="content">
-//                     <div className="header">
-//                         {post.title}
-//                     </div>
-//                     <div className="meta">
-//                         {post.due}
-//                     </div>
-//                     <div className="description">
-//                         <p>{post.content}</p>
-//                     </div>
-
-//                 </div>
-
-
-//             </div>
-
-//         </div>
-//     )
-// }
+import { fetchPosts } from '../../actions/'
 
 class Post extends Component{
+    componentDidMount(){
+        this.props.fetchPosts()
+    }
     render(){
         return(
             <div className="event">
@@ -61,4 +32,7 @@ class Post extends Component{
 }
 
 
-export default Post
+export default connect(
+    null,
+    { fetchPosts }
+  )(Post);
