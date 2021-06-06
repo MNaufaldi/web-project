@@ -1,15 +1,10 @@
 import React from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
-import $ from 'jquery';
+
 
 
 class CreatePost extends React.Component {
-    componentDidMount(){
-      $('#calendar').calendar({
-        type: 'date'
-      });
-    }
     renderError({ error, touched }) {
         if (touched && error) {
           return (

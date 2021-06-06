@@ -1,30 +1,19 @@
 const passport = require('passport');
+const express = require('express');
+const router = express.Router();
 
-module.exports = app => {
-  app.post(
-    '/auth',
-    // passport.authenticate('local')
-    // console.log('ye')
-    (res, err) =>{
-      console.log(res)
-      console.log(err)
-    }
-  );
-  
-  app.get(
-    '/auth/test', (req, res) =>{
-      res.send('a');
-    }
-  )
+router.post('/', (req, res) => {
+  // Authenticate user
+});
 
-  app.get('/auth/callback', passport.authenticate('local'));
+router.get('/logout', (req, res) => {
+  // Logout
+  req.logout();
+  req.send(req.user);
+});
 
-  app.get('/api/logout', (req, res) => {
-    req.logout();
-    res.send(req.user);
-  });
+router.get('/current_user', (req, res) => {
+  res.send(req.user)
+});
 
-  app.get('/api/current_user', (req, res) => {
-    res.send(req.user);
-  });
-};
+module.exports = router;
