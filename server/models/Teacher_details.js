@@ -13,8 +13,12 @@ const teacherDetailsSchema = new Schema({
     HomeroomID: {
         type: String,
         required: false
+    },
+    ScheduleID: {
+        type: String,
+        required: false
     }
 },
-{collection:"TeacherDetails"});
+);
 
-module.exports = TeacherDetails = mongoose.model('TeacherDetails', teacherDetailsSchema);
+module.exports = mongoose.model('TeacherDetails', teacherDetailsSchema);

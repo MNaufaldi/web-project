@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const postSchema = new Schema({
-    PostID: {
-        type: String,
-        required: true
-    },
     TeacherID: {
         type: String,
         required: true
@@ -17,8 +13,12 @@ const postSchema = new Schema({
     ClassID: {
         type: String,
         required: true
+    },
+    Batch: {
+        type: Date,
+        required: true
     }
 },
-{collection:"Post"});
+);
 
-module.exports = Post = mongoose.model('Post', postSchema);
+module.exports = mongoose.model('Post', postSchema);

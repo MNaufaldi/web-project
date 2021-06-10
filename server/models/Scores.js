@@ -10,6 +10,6 @@ const scoresSchema = new Schema({
         type: [{SubjectID: String, Score: Number}]
     }
 },
-{collection:"Scores"});
+);
 
-module.exports = Scores = mongoose.model('Scores', scoresSchema);
+module.exports = mongoose.model('Scores', scoresSchema);

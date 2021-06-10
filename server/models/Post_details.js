@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const postDetailsSchema = new Schema({
-    PostID: {
-        type: String,
-        required: true
-    },
     Title: {
         type: String,
         required: true
@@ -23,6 +19,6 @@ const postDetailsSchema = new Schema({
         required: true
     }
 },
-{collection:"PostDetails"});
+);
 
-module.exports = PostDetails = mongoose.model('PostDetails', postDetailsSchema);
+module.exports = mongoose.model('PostDetails', postDetailsSchema);

@@ -28,7 +28,7 @@ class users {
         
         if(!validPass) return res.status.send('Invalid password');
         // Assign token
-        const token = jwt.sign({_id: user.ID}, config.secret)
+        const token = jwt.sign({_id: user._id}, config.secret)
         return token
     }   
 }

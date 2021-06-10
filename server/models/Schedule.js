@@ -11,6 +11,6 @@ const scheduleSchema = new Schema({
         required: true
     }
 },
-{collection:"Schedule"});
+);
 
-module.exports = Schedule = mongoose.model('Schedule', scheduleSchema);
+module.exports = mongoose.model('Schedule', scheduleSchema);

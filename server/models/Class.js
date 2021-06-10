@@ -12,13 +12,13 @@ const classSchema = new Schema({
     },
     StudentsID: {
         type: [String],
-        required: true
+        required: false
     },
     TeacherID: {
         type: String,
-        required: true
+        required: false
     },
 },
-{collection:"Class"});
+);
 
-module.exports = Class = mongoose.model('Class', classSchema);
+module.exports = mongoose.model('Class', classSchema);
