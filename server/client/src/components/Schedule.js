@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-
 
 class Schedule extends Component{
     render(){
@@ -8,10 +6,10 @@ class Schedule extends Component{
             <div className="item">
                 <div className="content">
                     <div className="header">
-                        head
+                        {this.props.schedule[0]}
                     </div>
                     <div className="description">
-                        desc
+                        {this.props.schedule[1]}
                     </div>
                 </div>
             </div>

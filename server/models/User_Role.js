@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const userRoleSchema = new Schema({
-    RoleID: {
+    Role: {
         type: String,
         required: true
     }

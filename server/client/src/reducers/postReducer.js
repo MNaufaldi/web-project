@@ -6,13 +6,10 @@ import{
 export default (state = {}, action) => {
     switch (action.type) {
       case FETCH_POSTS:
-        console.log('FETCH_POSTS reducer');
-        return { ...state};
+        return {...state, posts: action.payload.data};
       case CREATE_POST:
-        console.log('CREATE_POST reducer');
         return { ...state};
       default:
-        console.log('default');
         return state;
     }
 };

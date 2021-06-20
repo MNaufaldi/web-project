@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const studentDetailsSchema = new Schema({
     ClassID: {
-        type: String,
+        type: [String],
         required: false
     },
     Batch: {

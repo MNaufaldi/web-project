@@ -8,21 +8,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User_Role = require('../models/User_Role');
 const Student_details = require('../models/Student_details');
-// Separate joi to another file
-// const Joi = require('@hapi/joi');
+const dotenv = require('dotenv');
+const Teacher_details = require('../models/Teacher_details');
 
-// const schema = {
-//     username: Joi.string().min(6).required(),
-//     password: Joi.string().min(6).required(),
-    
-// }
+dotenv.config();
 
 // Routes
 // Register student
 router.post('/register/student', async (req, res) => {
-    // Validation
-    // const {error} = Joi.validate(req.body, schema);
-    // if(error) return res.status(400).send(error.details[0].message);
+
     // Check if user exist
     const userExist = await User.findOne({ Username: req.body.username});
     if (userExist) return res.status(400).send('User already exist');
@@ -45,11 +39,12 @@ router.post('/register/student', async (req, res) => {
     });
     const student_details = new StudentDetails({
         _id: user._id,
-        Batch: currentYear
+        Batch: currentYear,
+        ClassID: []
     });
     const student_role = new UserRole({
         _id: user._id,
-        RoleID: '1'
+        Role: 'Student'
     });
 
     try{
@@ -61,14 +56,14 @@ router.post('/register/student', async (req, res) => {
         try {
             await student_details.save()
         } catch(e) {
-            User.deleteOne({_id: user._id})
+            await User.deleteOne({_id: user._id})
             res.status(400).send(err)
         }
         try {
             await student_role.save()
         } catch(e) {
-            User.deleteOne({_id: user._id})
-            StudentDetails.deleteOne({_id: user._id})
+            await User.deleteOne({_id: user._id})
+            await StudentDetails.deleteOne({_id: user._id})
             res.status(400).send(err)
         }
         res.sendStatus(200);
@@ -79,9 +74,6 @@ router.post('/register/student', async (req, res) => {
 });
 // Register teacher
 router.post('/register/teacher', async (req, res) => {
-    // Validation
-    // const {error} = Joi.validate(req.body, schema);
-    // if(error) return res.status(400).send(error.details[0].message);
     // Check if user exist
     const userExist = await User.findOne({ Username: req.body.username});
     if (userExist) return res.status(400).send('User already exist');
@@ -108,27 +100,27 @@ router.post('/register/teacher', async (req, res) => {
     });
     const teacher_role = new UserRole({
         _id: user._id,
-        RoleID: '2'
+        Role: 'Teacher'
     });
 
     try{
         try {
             await user.save()
         } catch(e) {
-            res.status(400).send(err)
+            res.status(400).send(e)
         }
         try {
             await teacher_details.save()
         } catch(e) {
-            User.deleteOne({_id: user._id})
-            res.status(400).send(err)
+            await User.deleteOne({_id: user._id})
+            res.status(400).send(e)
         }
         try {
             await teacher_role.save()
         } catch(e) {
-            User.deleteOne({_id: user._id})
-            TeacherDetails.deleteOne({_id: user._id})
-            res.status(400).send(err)
+            await User.deleteOne({_id: user._id})
+            await TeacherDetails.deleteOne({_id: user._id})
+            res.status(400).send(e)
         }
         res.sendStatus(200);
     } catch(err) {
@@ -137,6 +129,7 @@ router.post('/register/teacher', async (req, res) => {
 })
 // Login
 router.post('/login', async (req, res) => {
+    // Find user with the same username
     const user = await User.findOne({Username: req.body.username});
     // If there is no said username
     if (!user) return res.status(400).send('Invalid username or password');
@@ -144,29 +137,74 @@ router.post('/login', async (req, res) => {
     const validPass = await bcrypt.compare(req.body.password, user.Password);
     // const validPass = req.body.password === user.Password;
     if(!validPass) return res.status(400).send('Invalid password');
-
     // GET ROLES
     const role = await UserRole.findOne({_id: user._id});
     if (!role) return res.status(400)
 
     // Assign token
-    const token = jwt.sign({_id: user._id, role:role.RoleID}, process.env.SECRET)
-    req.user = user;
-    res.header('auth-token', token).send(token);
+    const token = jwt.sign({_id: user._id, role:role.Role}, process.env.SECRET, {expiresIn: '24h'});
+    user.Password = undefined;
+    const payload = {id: user._id, token: token};
+    res.header('auth-token', token);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.status(200).send(payload);
+    
 });
-// Get user by id
-router.get('/get/:id', async (req, res) => {
-    const user = await User.findOne({_id: req.params.id});
+// Get user
+router.get('/get', async (req, res) => {
+    const token = req.header('auth-token');
+    const decoded = jwt.verify(token, process.env.SECRET)
+    const user = await User.findOne({_id: decoded._id});
     if (!user) return res.status(400)
-    const user_details = {
-        'id' : user._id,
-        'First_name' : user.First_name,
-        'Last_name' : user.Last_name,
-        'Photo' : user.Photo,
-        'dateOfBirth' : user.DateOfBirth
-    };
-    res.status(200).send(user_details);
+
+    // Get role
+    var details;
+    const role = await UserRole.findOne({_id: decoded._id});
+    if (!role) return res.status(400)
+    switch (role.Role){
+        case 'Student':
+            details = await StudentDetails.findOne({_id: decoded._id});
+            details = {
+                Batch: details.Batch,
+                ClassID: details.ClassID
+            };
+            break; 
+        case 'Teacher':
+            details = await TeacherDetails.findOne({_id: decoded._id});
+            details = {
+                SubjectID: details.SubjectID,
+                ClassID: details.ClassID
+            };
+            break;
+    }
+    const payload = {user, details};
+    payload.user.Username = undefined;
+    payload.user.Password = undefined;
+    payload.user._id - undefined;
+    res.status(200).send(payload);
 });
+router.get('/auth', async (req, res) => {
+    const token = req.header('auth-token');
+    if(!token)  return res.status(401).send(false);
+    try {
+        const verified = jwt.verify(token, process.env.SECRET);
+        res.status(200).send(true)
+    } catch(err) {
+        res.sendStatus(400);
+    }
+})
+// Get Role
+router.get('/get/role', async (req, res) => {
+    const token = req.header('auth-token');
+    if(!token) return res.status(400);
+    const decoded = jwt.verify(token, process.env.SECRET);
+    // Verify role?
+    const role = await UserRole.findOne({_id: decoded._id});
+    if(!role) return res.status(400);
+    if(role.Role !== decoded.role) return res.status(400);
+    res.status(200).send(role.Role);
+
+})
 // Edit user
 router.patch('/patch/:id', async (req, res) => {
     try{
@@ -177,6 +215,7 @@ router.patch('/patch/:id', async (req, res) => {
     }
     
 });
+
 // Delete user
 router.delete('/delete/:id', async (req, res) => {
     const _id = req.params.id

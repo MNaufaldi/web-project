@@ -14,10 +14,10 @@ const classSchema = new Schema({
         type: [String],
         required: false
     },
-    TeacherID: {
+    Batch: {
         type: String,
-        required: false
-    },
+        required: true
+    }
 },
 );
 

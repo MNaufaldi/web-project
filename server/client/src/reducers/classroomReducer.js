@@ -1,22 +1,24 @@
 import{
     FETCH_CLASSROOM,
     CREATE_CLASSROOM,
+    FETCH_CLASSROOM_NAME,
+    FETCH_SUBJECT,
     EDIT_CLASSROOM
 } from '../actions/types'
 
 export default (state = {}, action) => {
     switch (action.type) {
         case CREATE_CLASSROOM:
-            console.log('CREATE_CLASSROOM reducer');
             return { ...state};
         case FETCH_CLASSROOM:
-            console.log('FETCH_CLASSROOM reducer');
-            return { ...state};
+            return { ...state, payload: action.payload};
+        case FETCH_CLASSROOM_NAME:
+            return { ...state, name: action.payload};
         case EDIT_CLASSROOM:
-            console.log('EDIT_CLASSROOM reducer');
             return { ...state};
+        case FETCH_SUBJECT:
+            return { ...state, subjectName: action.payload};
         default:
-            console.log('default');
             return state;
     }
 };

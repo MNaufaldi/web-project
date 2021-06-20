@@ -9,10 +9,10 @@ class Layout extends Component{
                 <div className="three wide column">
                     <Navbar />
                 </div>
-                <div className="ten wide stretched column">
+                <div className="ten wide stretched column" style={{paddingTop: '4rem'}}>
                     {this.props.children}
                 </div>
-                <div className="three wide column">
+                <div className="three wide column"  style={{paddingTop: '4rem'}}>
                     <ScheduleList />
                 </div>
             </div>

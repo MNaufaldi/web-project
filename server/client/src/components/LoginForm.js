@@ -1,10 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
-import { login } from '../actions/index'
-
+import { login, fetchUser } from '../actions/index'
 
 class LoginForm extends React.Component {
+  componentDidMount() {
+    const user = sessionStorage.getItem('auth-token');
+    if (user !== null) {
+      this.props.history.push('/dashboard');               
+    }
+  }
+
     renderError({ error, touched }) {
       if (touched && error) {
         return (
@@ -25,31 +31,56 @@ class LoginForm extends React.Component {
         </div>
       );
     };
+
+    renderPassword = ({ input, label, meta }) => {
+      const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+      return (
+        <div className={className}>
+          <label>{label}</label>
+          <input {...input} autoComplete="off" type="password" />
+          {this.renderError(meta)}
+        </div>
+      );
+    };
   
     onSubmit = (formValues) => {
-      console.log(formValues);
-      // this.props.login(formValues);
+      this.props.login(formValues).then(async (response) => {
+        await this.props.fetchUser();
+        this.props.history.push('/dashboard');
+      }).catch(error => {
+        alert("Wrong username or password");
+      });  
     }
-  
+    
     render() {
+
       return (
-        <form
+        <div className="ui middle aligned center aligned grid" style={{paddingTop: '25vh'}}>
+          <div className="four wide column" >
+            <div className="ui segment">
+
+            
+          <form
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           className="ui form error"
-        >
-          <Field 
-          name="username" 
-          component={this.renderInput} 
-          label="Username" 
-          className="field"/>
-          <Field
+          >
+            <Field 
+            name="username" 
+            component={this.renderInput} 
+            label="Username" 
+            className="field"/>
+            <Field
             name="password"
-            component={this.renderInput}
+            component={this.renderPassword}
             label="Password"
             className="field"
-          />
-          <button className="ui button primary">Submit</button>
+            />
+            <button className="ui button primary" >Submit</button>
         </form>
+        </div>
+        </div>
+        </div>
+      
       );
     }
   }
@@ -72,5 +103,7 @@ class LoginForm extends React.Component {
     form: 'PostsNewForm', 
     validate
   })(LoginForm);
+
+
   
-  export default connect(null, { login })(formWrap);
+  export default connect(null, { login, fetchUser })(formWrap);

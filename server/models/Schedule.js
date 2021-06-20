@@ -2,13 +2,24 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const scheduleSchema = new Schema({
-    ScheduleID: {
+    TeacherID: {
         type: String,
-        required: true
+        required: false
     },
     ClassID: {
         type: String,
-        required: true
+        required: false
+    },
+    ScheduleID: {
+        type: String,
+        required: false
+    },
+    Schedule: { 
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: []
     }
 },
 );

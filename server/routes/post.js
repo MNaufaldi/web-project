@@ -4,25 +4,26 @@ const Post = require('../models/Post');
 const Post_details = require('../models/Post_details');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-
+const differenceInDays = require('date-fns/differenceInDays');
 dotenv.config();
 
 // Create new post
 router.post('/create', async (req, res) => {
+    // TEACHER ONLY
     // Add validation with Joi later
-
     // Get payload from token
     const payload = jwt.verify(req.header('auth-token'), process.env.SECRET);
     // Maybe verify if its a teacher?
     
     // Get date now
     const date = new Date();
+    const dateDue = new Date(req.body.dueDate);
 
     // Create new post
     const newPost = new Post({
         TeacherID: payload._id,
         SubjectID: req.body.subjectId,
-        ClassID: req.body.classId,
+        ClassID: req.body.class,
         Batch: req.body.batch
     });
     // Create new post details
@@ -31,12 +32,26 @@ router.post('/create', async (req, res) => {
         Title: req.body.title,
         Description: req.body.description,
         Date_created: date,
-        Date_due: req.body.dateDue
+        Date_due: dateDue
     });
 
     // save to database
-    console.log(newPost);
-    console.log(newPostDetails);
+    try {
+        try {
+            await newPost.save();
+        } catch(e) {
+            console.log(e);
+        }
+        try {
+            await newPostDetails.save();
+        } catch(e) {
+            await Post.deleteOne({_id: newPost._id});
+            console.log(e);
+        }  
+    } catch(err) {
+        res.status(400).send(err);
+    }
+    res.sendStatus(200);
 
 })
 // Delete a post
@@ -64,23 +79,67 @@ router.patch('/patch/:id', async (req, res) => {
     } catch(e) {
         res.sendStatus(400);
     }
-    
-    
 });
 // Get posts
-router.get('/get/:classId-:batch', async(req, res) => {
-    try {
-        const posts = await Post.find({ClassID: req.params.classId, Batch: req.params.batch});
-        if (!posts) res.status(200).send('None');
-    } catch(err) {
-        res.sendStatus(400);
+router.get('/get/:id', async(req, res) => {
+    // Get token
+    const token = jwt.verify(req.header('auth-token'), process.env.SECRET);
+    if(!token) return res.sendStatus(400);
+    let posts;
+    const date = new Date();
+    const formed = date.toISOString().split("T")[0];
+    switch (token.role){
+        case 'Student':
+            try {
+                const classId = req.params.id.slice(0, 1);
+                const batch = req.params.id.slice(1, req.params.id.length);
+                posts = await Post.find({ClassID: classId, Batch: batch}).lean();
+            } catch (err) {
+                res.sendStatus(400);
+            }
+            break;
+        case 'Teacher':
+            try {
+                posts = await Post.find({TeacherID: req.params.id}).lean();
+            } catch (err) {
+                res.sendStatus(400);
+            }
+            break;
     }
-    // Get the posts details
-    // try {
-    //     const posts_details = await Post_details.find({_id: posts._id})
-    // }
-    // Map and return the posts and the details
 
+    // If there is no posts
+    if (!posts) return res.send(null);
+    // Put post id in an array
+    var ids = [];
+    for (var key in posts) {
+        ids.push(posts[key]._id);
+    }
+
+    let posts_details;
+    try {
+        posts_details = await Post_details.find({_id: ids}).lean()
+    } catch (err) {
+        res.sendStatus(400);
+    };
+
+    // Combine the 2 array of objects
+    let mapped = posts_details.reduce((a, c) => (a[c._id] = c, a), {});
+    let payload = posts.map(o => Object.assign(o, mapped[o._id]));
+    // Delete posts that are due
+    payload = payload.filter(obj => obj.Date_due > date);
+    
+    // Sort by due date
+    payload.sort(function(a, b){ 
+        return new Date(a.Date_due) - new Date(b.Date_due);
+    })
+    
+    // Format dates
+    payload.forEach(obj => {
+        obj.Date_created = differenceInDays(new Date(formed), new Date(obj.Date_created))
+        obj.Date_due = differenceInDays(new Date(obj.Date_due), new Date(formed))
+    })
+    //  
+    res.status(200).send(payload);
 })
 
 module.exports = router;
