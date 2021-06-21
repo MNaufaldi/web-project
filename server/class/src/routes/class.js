@@ -7,7 +7,12 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { Mongoose } = require('mongoose');
 
+dotenv.config();
+
 // SCHEDULE
+router.get('/', (req, res) => {
+    res.send('class');
+})
 // Get schedule
 router.get('/get/schedule/:id', async (req, res) => {
     const token = jwt.verify(req.header('auth-token'), process.env.SECRET);

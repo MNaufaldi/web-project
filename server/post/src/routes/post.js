@@ -7,6 +7,11 @@ const dotenv = require('dotenv');
 const differenceInDays = require('date-fns/differenceInDays');
 dotenv.config();
 
+
+router.get('/', (req, res) => {
+    res.send('post');
+})
+
 // Create new post
 router.post('/create', async (req, res) => {
     // TEACHER ONLY

@@ -1,10 +1,8 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
-const post = require('./routes/post');
-const classroom = require('./routes/class');
+const post = require('./src/routes/post');
 const app = express();
-const user = require('./routes/user');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -21,9 +19,8 @@ app.use(function(req, res, next) {
 	res.header('Access-Control-Allow-Headers', 'auth-token, Content-Type, Accept');
 	next();
   });
-app.use('/api/user', user)
-app.use('/api/post', post)
-app.use('/api/class', classroom)
 
-const port = process.env.PORT || 5000;
+app.use('/api/post', post)
+
+const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server is running on port ${port}`));

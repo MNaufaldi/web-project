@@ -1,19 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/User');
 const StudentDetails = require('../models/Student_details');
 const TeacherDetails = require('../models/Teacher_details');
 const UserRole = require('../models/User_Role');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User_Role = require('../models/User_Role');
-const Student_details = require('../models/Student_details');
+
 const dotenv = require('dotenv');
-const Teacher_details = require('../models/Teacher_details');
 
 dotenv.config();
 
 // Routes
+router.get('/', (req, res) => {
+    res.send('student');
+})
 // Register student
 router.post('/register/student', async (req, res) => {
 
@@ -226,7 +228,7 @@ router.delete('/delete/:id', async (req, res) => {
         res.sendStatus(400);
     }
     try {
-        const role = await User_Role.findByIdAndDelete(_id);
+        const role = await UserRole.findByIdAndDelete(_id);
         res.sendStatus(200);
     } catch(err) {
         await user.save();
@@ -236,9 +238,9 @@ router.delete('/delete/:id', async (req, res) => {
         const details = null;
         switch (role.RoleID) {
             case '1':
-                details = await Student_details.findByIdAndDelete(_id);
+                details = await StudentDetails.findByIdAndDelete(_id);
             case '2':
-                details = await Teacher_details.findByIdAndDelete(_id);
+                details = await TeacherDetails.findByIdAndDelete(_id);
         }
     } catch(err) {
         await user.save();
